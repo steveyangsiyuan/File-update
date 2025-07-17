@@ -12,8 +12,14 @@ def index():
     files = os.listdir(UPLOAD_FOLDER)
     return render_template('index.html', files=files)
 
+UPLOAD_PASSWORD = "wwy"  # 👈 change this to your own secret
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    password = request.form.get('password', '')
+    if password != UPLOAD_PASSWORD:
+        return 'Unauthorized. <a href="/">Go back</a>', 403
+
     if 'file' not in request.files:
         return 'No file part'
     file = request.files['file']
@@ -23,6 +29,7 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filepath)
         return 'File uploaded successfully! <a href="/">Go back</a>'
+
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
